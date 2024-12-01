@@ -1,0 +1,3 @@
+cargo:rerun-if-changed=build/main.rs
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/Users/ueyamamasashi/dfinity/vetkeys_example/target/wasm32-unknown-unknown/release/build/typenum-37a2fd3f2eb9f2d2/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/Users/ueyamamasashi/dfinity/vetkeys_example/target/wasm32-unknown-unknown/release/build/typenum-37a2fd3f2eb9f2d2/out/op.rs
