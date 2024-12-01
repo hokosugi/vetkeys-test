@@ -61,6 +61,8 @@ actor {
         Hex.encode(Blob.toArray(public_key));
     };
 
+// グループでencrypted_keyを作成するには引数(encryption_public_key)を配列(encryption_public_keys)にする
+// encrypted_keyはローカルに保存？
     public shared ({ caller }) func encrypted_ibe_decryption_key_for_caller(encryption_public_key : Blob) : async Text {
         Debug.print("encrypted_ibe_decryption_key_for_caller: caller: " # debug_show (caller));
 
