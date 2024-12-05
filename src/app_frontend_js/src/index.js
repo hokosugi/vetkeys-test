@@ -213,25 +213,25 @@ async function ibe_encrypt(message) {
   return hex_encode(ibe_ciphertext.serialize());
 }
 
-async function ibe_decrypt(ibe_ciphertext_hex) {
-  document.getElementById("ibe_decrypt_result").innerText = "Preparing IBE-decryption..."
-  const tsk_seed = window.crypto.getRandomValues(new Uint8Array(32));
-  const tsk = new vetkd.TransportSecretKey(tsk_seed);
-  document.getElementById("ibe_decrypt_result").innerText = "Fetching IBE decryption key..."
-  const ek_bytes_hex = await app_backend_actor.encrypted_ibe_decryption_key_for_caller(tsk.public_key());
-  document.getElementById("ibe_decrypt_result").innerText = "Fetching IBE enryption key (needed for verification)..."
-  const pk_bytes_hex = await app_backend_actor.ibe_encryption_key();
+// async function ibe_decrypt(ibe_ciphertext_hex) {
+//   document.getElementById("ibe_decrypt_result").innerText = "Preparing IBE-decryption..."
+//   const tsk_seed = window.crypto.getRandomValues(new Uint8Array(32));
+//   const tsk = new vetkd.TransportSecretKey(tsk_seed);
+//   document.getElementById("ibe_decrypt_result").innerText = "Fetching IBE decryption key..."
+//   const ek_bytes_hex = await app_backend_actor.encrypted_ibe_decryption_key_for_caller(tsk.public_key());
+//   document.getElementById("ibe_decrypt_result").innerText = "Fetching IBE enryption key (needed for verification)..."
+//   const pk_bytes_hex = await app_backend_actor.ibe_encryption_key();
 
-  const k_bytes = tsk.decrypt(
-    hex_decode(ek_bytes_hex),
-    hex_decode(pk_bytes_hex),
-    app_backend_principal.toUint8Array()
-  );
+//   const k_bytes = tsk.decrypt(
+//     hex_decode(ek_bytes_hex),
+//     hex_decode(pk_bytes_hex),
+//     app_backend_principal.toUint8Array()
+//   );
 
-  const ibe_ciphertext = vetkd.IBECiphertext.deserialize(hex_decode(ibe_ciphertext_hex));
-  const ibe_plaintext = ibe_ciphertext.decrypt(k_bytes);
-  return new TextDecoder().decode(ibe_plaintext);
-}
+//   const ibe_ciphertext = vetkd.IBECiphertext.deserialize(hex_decode(ibe_ciphertext_hex));
+//   const ibe_plaintext = ibe_ciphertext.decrypt(k_bytes);
+//   return new TextDecoder().decode(ibe_plaintext);
+// }
 
 document.getElementById("login").onclick = async (e) => {
   e.preventDefault();
@@ -287,3 +287,45 @@ const hex_decode = (hexString) =>
   Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 const hex_encode = (bytes) =>
   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+
+
+// グループ管理用のUI要素を追加
+document.getElementById("create_group_form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const groupId = document.getElementById("group_id").value;
+    await app_backend_actor.createGroup(groupId);
+});
+
+document.getElementById("add_member_form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const groupId = document.getElementById("group_id").value;
+    const memberPrincipal = document.getElementById("member_principal").value;
+    const permission = document.getElementById("permission").value;
+    await app_backend_actor.addMemberToGroup(groupId, memberPrincipal, { [permission]: null });
+});
+
+// 既存のIBE暗号化関数を修正
+async function ibe_decrypt(ibe_ciphertext_hex) {
+    const groupId = document.getElementById("group_id").value;
+    document.getElementById("ibe_decrypt_result").innerText = "Preparing IBE-decryption..."
+    const tsk_seed = window.crypto.getRandomValues(new Uint8Array(32));
+    const tsk = new vetkd.TransportSecretKey(tsk_seed);
+
+    document.getElementById("ibe_decrypt_result").innerText = "Fetching IBE decryption key..."
+    const ek_bytes_hex = await app_backend_actor.encrypted_ibe_decryption_key_for_caller(
+        groupId,
+        tsk.public_key()
+    );
+  document.getElementById("ibe_decrypt_result").innerText = "Fetching IBE enryption key (needed for verification)..."
+     const pk_bytes_hex = await app_backend_actor.ibe_encryption_key();
+
+     const k_bytes = tsk.decrypt(
+       hex_decode(ek_bytes_hex),
+       hex_decode(pk_bytes_hex),
+       app_backend_principal.toUint8Array()
+     );
+
+     const ibe_ciphertext = vetkd.IBECiphertext.deserialize(hex_decode(ibe_ciphertext_hex));
+     const ibe_plaintext = ibe_ciphertext.decrypt(k_bytes);
+     return new TextDecoder().decode(ibe_plaintext);
+}

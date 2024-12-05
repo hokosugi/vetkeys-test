@@ -13,6 +13,8 @@
 <body>
   <main>
     <h1 id="vetkddemo">vetKD Demo</h1>
+<!--
+
     <form id="login_form">
       <label for="login" id="principal"></label>
       <button id="login">Login (optional)</button>
@@ -53,6 +55,30 @@
     <section id="ibe_decrypt_result"></section>
     <hr />
     <img src="logo2.svg" id="builtonchainlogo" />
+-->
+    <!-- グループ管理セクション -->
+    <div id="group_management">
+        <h2>Group Management</h2>
+        <form id="create_group_form">
+            <input type="text" id="group_id" placeholder="Group ID">
+            <button type="submit">Create Group</button>
+        </form>
+
+        <form id="add_member_form">
+            <input type="text" id="member_principal" placeholder="Member Principal">
+            <select id="permission">
+                <option value="Owner">Owner</option>
+                <option value="Editor">Editor</option>
+                <option value="Viewer">Viewer</option>
+            </select>
+            <button type="submit">Add Member</button>
+        </form>
+    </div>
+
+    <!-- 既存の暗号化/復号化フォーム -->
+    <div id="encryption_section">
+        <!-- 既存のフォームは維持 -->
+    </div>
   </main>
 </body>
 
